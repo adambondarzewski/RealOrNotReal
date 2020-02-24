@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Analysis flow
+rmd report with visualisations
+git repo - submission per commit
+
+# TODO
+- text mining model with R - comparison article
+
+```{r}
+.libPaths("/mnt/vol/dev/privateRepo/")
+
+## Importing packages
+library(tidyverse)
+library(magrittr)
+library(stringi)
+library(tm)
+library(glmnet)
+library(caret)
+require(e1071)
+library(text2vec) # text vectorization
+library(glmnet) # building model cv.gmlnet()
+library(MLmetrics) # F1_Score()
+```
+
+```{r}
+train_df<-read_csv("data/train.csv")
+test_df<-read_csv("data/test.csv")
+```
+
+# Few positive and few negative
+```{r}
+train_df %>% filter(target == 0) 
+train_df %>% filter(target == 1)
+```
+
+# Removing invalid targets
+```{r}
+train_df %<>% distinct(keyword, location, text, .keep_all = TRUE)
+```
+
+```{r}
+train_df %>% nrow()
+```
+
+# Trying small sample
+```{r}
+it <- itoken(train_df %>% slice(1:5) %>% pull(text), preprocess_function = tolower, 
+             tokenizer = word_tokenizer, chunks_number = 10, progessbar = F)
+
+vocab <- create_vocabulary(it, ngram = c(1L, 1L))
+```
+
