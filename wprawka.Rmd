@@ -94,10 +94,10 @@ fit_tf <- cv.glmnet(x = dtm_tf, y = train_df[['target']],
                  # 5-fold cross-validation
                  nfolds = 5,
                  # high value, less accurate, but faster training
-                 thresh = 1e-3,
+                 thresh = 1e-5,
                  # again lower number iterations for faster training
                  # in this vignette
-                 maxit = 1e3
+                 maxit = 1e4
                 )
 print (paste("min MAE = ", round(min(fit_tf$cvm), 4)))
 plot(fit_tf)
