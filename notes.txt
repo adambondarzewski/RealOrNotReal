@@ -1,0 +1,2 @@
+- try modifying parameters and check how it affects score
+- think about additional steps (data preparation, more complex model, etc)
