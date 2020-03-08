@@ -27,8 +27,15 @@ library(MLmetrics) # F1_Score()
 ```
 
 ```{r}
-train_df<-read_csv("data/train.csv")
-test_df<-read_csv("data/test.csv")
+colsSpec <- cols(
+  id = col_integer(),
+  keyword = col_character(),
+  location = col_character(),
+  text = col_character(),
+  target = col_integer()
+)
+train_df<-read_csv("data/train.csv", col_types = colsSpec)
+test_df<-read_csv("data/test.csv", col_types = colsSpec)
 ```
 
 # Few positive and few negative
@@ -52,5 +59,58 @@ it <- itoken(train_df %>% slice(1:5) %>% pull(text), preprocess_function = tolow
              tokenizer = word_tokenizer, chunks_number = 10, progessbar = F)
 
 vocab <- create_vocabulary(it, ngram = c(1L, 1L))
+```
+
+```{r}
+# training data:
+it <- itoken(train_df[['text']], preprocess_function = tolower, 
+             tokenizer = word_tokenizer, chunks_number = 10, progessbar = F)
+vocab <- create_vocabulary(it, ngram = c(1L, 1L))
+# and pruning our vocabulary
+pruned_vocab <- prune_vocabulary(vocab, term_count_min = 10,
+ doc_proportion_max = 0.5, doc_proportion_min = 0.001)
+dtm = create_dtm(it, vocab_vectorizer(pruned_vocab))
+# test data:
+it_test <- itoken(test_df[['text']], preprocess_function = tolower, 
+             tokenizer = word_tokenizer, chunks_number = 10, progessbar = F)
+dtm_test = create_dtm(it_test, vocab_vectorizer(pruned_vocab ))
+```
+
+# Fit model
+```{r}
+actual = train_df[['target']]
+
+tfidf = TfIdf$new(smooth_idf = TRUE, norm = c( 'l2'), sublinear_tf = TRUE) # norm = 'none' gives the same result as above
+dtm_tf <- tfidf$fit_transform(dtm)
+dtm_tf_test <- tfidf$transform(dtm_test)
+set.seed(8) # just making model reproduceable
+
+fit_tf <- cv.glmnet(x = dtm_tf, y = train_df[['target']], 
+                 family = 'binomial', 
+                 # lasso penalty
+                 alpha = 1,
+                 # interested mean absolute error
+                 type.measure = "mae",
+                 # 5-fold cross-validation
+                 nfolds = 5,
+                 # high value, less accurate, but faster training
+                 thresh = 1e-3,
+                 # again lower number iterations for faster training
+                 # in this vignette
+                 maxit = 1e3
+                )
+print (paste("min MAE = ", round(min(fit_tf$cvm), 4)))
+plot(fit_tf)
+
+pred = predict(fit_tf,dtm_tf,type = "class")
+print(paste("F1 (train_df, binomial + TfIdf) = ",round(F1_Score(actual,pred,positive = 1),4)))
+```
+# Submit
+```{r}
+sample_submission <- read_csv("./data/sample_submission.csv")
+sample_submission["target"] = predict(fit_tf,dtm_tf_test,type = "class")
+write.csv(sample_submission,"submission.csv", row.names = FALSE,quote = FALSE)
+
+
 ```
 
