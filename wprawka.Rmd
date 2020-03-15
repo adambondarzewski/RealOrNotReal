@@ -110,7 +110,5 @@ print(paste("F1 (train_df, binomial + TfIdf) = ",round(F1_Score(actual,pred,posi
 sample_submission <- read_csv("./data/sample_submission.csv")
 sample_submission["target"] = predict(fit_tf,dtm_tf_test,type = "class")
 write.csv(sample_submission,"submission.csv", row.names = FALSE,quote = FALSE)
-
-
 ```
 
