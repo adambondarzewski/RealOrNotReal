@@ -53,14 +53,6 @@ train_df %<>% distinct(keyword, location, text, .keep_all = TRUE)
 train_df %>% nrow()
 ```
 
-# Trying small sample
-```{r}
-it <- itoken(train_df %>% slice(1:5) %>% pull(text), preprocess_function = tolower, 
-             tokenizer = word_tokenizer, chunks_number = 10, progessbar = F)
-
-vocab <- create_vocabulary(it, ngram = c(1L, 1L))
-```
-
 ```{r}
 # training data:
 it <- itoken(train_df[['text']], preprocess_function = tolower, 
