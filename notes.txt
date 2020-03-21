@@ -3,4 +3,3 @@
 
 ideas:
 - combine model based on "keyword" and "location" with model using dtm
-- try to use stemDocument but for which class of objects?
