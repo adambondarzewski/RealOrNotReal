@@ -47,7 +47,7 @@ it <- itoken(train_df[['text']], preprocess_function = tolower,
              tokenizer = word_tokenizer, chunks_number = 10, progessbar = F)
 vocab <- create_vocabulary(it, ngram = c(1L, 1L))
 # and pruning our vocabulary
-pruned_vocab <- prune_vocabulary(vocab, term_count_min = 15,
+pruned_vocab <- prune_vocabulary(vocab, term_count_min = 11,
  doc_proportion_max = 0.5, doc_proportion_min = 0.001)
 dtm = create_dtm(it, vocab_vectorizer(pruned_vocab))
 # test data:
