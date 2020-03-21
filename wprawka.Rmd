@@ -11,19 +11,7 @@ git repo - submission per commit
 - text mining model with R - comparison article
 
 ```{r}
-.libPaths("/mnt/vol/dev/privateRepo/")
-
-## Importing packages
-library(tidyverse)
-library(magrittr)
-library(stringi)
-library(tm)
-library(glmnet)
-library(caret)
-require(e1071)
-library(text2vec) # text vectorization
-library(glmnet) # building model cv.gmlnet()
-library(MLmetrics) # F1_Score()
+source("setup.R")
 ```
 
 ```{r}
@@ -65,7 +53,7 @@ dtm = create_dtm(it, vocab_vectorizer(pruned_vocab))
 # test data:
 it_test <- itoken(test_df[['text']], preprocess_function = tolower, 
              tokenizer = word_tokenizer, chunks_number = 10, progessbar = F)
-dtm_test = create_dtm(it_test, vocab_vectorizer(pruned_vocab ))
+dtm_test = create_dtm(it_test, vocab_vectorizer(pruned_vocab )) 
 ```
 
 # Fit model
