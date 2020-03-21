@@ -41,6 +41,12 @@ train_df %<>% distinct(keyword, location, text, .keep_all = TRUE)
 train_df %>% nrow()
 ```
 
+# Cleaning data
+```{r}
+train_df %<>% mutate(text = stemDocument(text))
+test_df %<>% mutate(text = stemDocument(text))
+```
+
 ```{r}
 # training data:
 it <- itoken(train_df[['text']], preprocess_function = tolower, 
